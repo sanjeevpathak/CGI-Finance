@@ -37,6 +37,28 @@ public class AccountController {
 	AccountService accountRepository; 
 	@Autowired
 	TransactionHistoryService historyRepository ;
+	
+	
+	/*
+	 * @api{get}
+	 * 
+	 * @apiVersion 1.0.0
+	 * 
+	 * @apiDescription provide the information of already existing customer
+	 * 
+	 * @apiDescription
+	 * 
+	 * @apiUri http://localhost:8080/api/v1//customer/{accountID}
+	 *  onSuccess {
+	 * "accountID": "2345", "customerName": "Pathak", "accountBalance": 101 }
+	 *  when customer information does not exist
+	 * 
+	 * { "timestamp": "2020-10-12T05:48:41.690+00:00", "message":
+	 * "No customer exist with Id :2341", "details": "uri=/api/v1/customer/2341" }
+	 * 
+	 */
+	
+	
 
 	@GetMapping("/customer/{accountID}")
 	public ResponseEntity<AccountDetails> getAccountDetailsByAccountId(@PathVariable("accountID") String accountID) {
@@ -57,6 +79,36 @@ public class AccountController {
 
 	}
 
+
+	/*
+	 * @api{post}
+	 * 
+	 * @apiVersion 1.0.0
+	 * 
+	 * @apiDescription create new user
+	 * 
+	 * @apiDescription
+	 * 
+	 * @apiUri http://localhost:8080/api/v1/customer
+	 * @apiParam
+	 * 		{  "accountID":"2345",
+				"customerName":"Pathak",
+				"initialCredit":101
+			}
+	 *  
+	 *    onSuccess 
+	 *    
+	 *    location →/customer/2345
+	 *    
+	 
+	 * customer information already  exist
+			{
+			    "timestamp": "2020-10-12T05:52:34.292+00:00",
+			    "message": "customer with account id 2345 already exist",
+			    "details": "uri=/api/v1/customer"
+			}	
+	 */
+
 	@PostMapping("/customer")
 	public ResponseEntity<String> createAccount(@RequestBody Customer customer) {
 		LOGGER.info("request received to create Customer{} " + customer);
@@ -75,6 +127,38 @@ public class AccountController {
 		return ResponseEntity.created(URI.create("/customer/" + customer.getAccountID())).build();
 
 	}
+	
+
+	/*
+	 * @api{put}
+	 * 
+	 * @apiVersion 1.0.0
+	 * 
+	 * @apiDescription update account balance
+	 * 
+	 * @apiDescription
+	 * 
+	 * @apiUri http://localhost:8080/api/v1/	customer
+	 * @apiParam
+	 * 		{  "accountID":"2345",
+				"balanceChange":507
+				
+			}
+	 *  
+	 *    onSuccess {
+	 *    
+	 *   return the updated balance
+	 *    }
+	 
+	 	 * when customer balance is negative customer 
+			{
+			    "timestamp": "2020-10-12T05:55:44.815+00:00",
+			    "message": "insufficient balance to process this request",
+			    "details": "uri=/api/v1/customer"
+			}	
+	 */
+
+
 
 	@PutMapping("/customer")
 	public double UpdateAccountBalance(@RequestBody BalanceTransaction balanceTransaction) {
@@ -91,7 +175,53 @@ public class AccountController {
 		return updateAccountBalance;
 
 	}
-
+	/*
+	 * @api{get}
+	 * 
+	 * @apiVersion 1.0.0
+	 * 
+	 * @apiDescription provide the history on balance change in sorted formet based on updated date  of already existing customer
+	 * 
+	 * @apiDescription
+	 * 
+	 * @apiUri http://localhost:8080/api/v1/history/customer/{accountID}
+	 *  onSuccess 
+			[
+		    {
+		        "accountId": "2345",
+		        "customerName": "Pathak",
+		        "balanceChange": 2422,
+		        "transactionTimestump": "2020-10-12T05:58:29.425+00:00"
+		    },
+		    {
+		        "accountId": "2345",
+		        "customerName": "Pathak",
+		        "balanceChange": 1515,
+		        "transactionTimestump": "2020-10-12T05:58:27.796+00:00"
+		    },
+		    {
+		        "accountId": "2345",
+		        "customerName": "Pathak",
+		        "balanceChange": 608,
+		        "transactionTimestump": "2020-10-12T05:54:45.525+00:00"
+		    },
+		    {
+		        "accountId": "2345",
+		        "customerName": "Pathak",
+		        "balanceChange": 101,
+		        "transactionTimestump": "2020-10-12T05:47:09.744+00:00"
+		    }
+		]
+ *  when customer information does not exist
+		 *  {
+		    "timestamp": "2020-10-12T06:00:10.327+00:00",
+		    "message": "No customer exist with Id :2347",
+		    "details": "uri=/api/v1/customer/history/2347"
+			}
+	 */
+	
+	
+	
 	@GetMapping("/customer/history/{accountID}")
 	public List<TransactionTable> getAccountHistoryByAccountId(@PathVariable("accountID") String accountID) {
 		LOGGER.info("received request to get history for account id {} " + accountID);
